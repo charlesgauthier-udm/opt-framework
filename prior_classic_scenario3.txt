@@ -1,0 +1,36 @@
+# Parameter prior file
+# File contains prior knowledge of parameters that are to be optimized
+parameter_name	lower_bound	higher_bound	distribution_type	initial_value
+bsratelt_NdlEvgTr	0.22265	0.66795	uniform	0.4453
+bsratelt_NdlDcdTr	0.29930	0.89790	uniform	0.5986
+bsratelt_BdlEvgTr	0.31695	0.95085	uniform	0.6339
+bsratelt_BdlDCoTr	0.37880	1.00000	uniform	0.7576
+bsratelt_BdlDDrTr	0.34785	1.00000	uniform	0.6957
+bsratelt_GrassC3	0.2630	0.7890	uniform	0.5260
+bsratelt_GrassC4	0.2630	0.7890	uniform	0.5260
+bsratesc_NdlEvgTr	0.0130	0.0390	uniform	0.0260
+bsratesc_NdlDcdTr	0.0130	0.0390	uniform	0.0260
+bsratesc_BdlEvgTr	0.0104	0.0312	uniform	0.0208
+bsratesc_BdlDCoTr	0.0104	0.0312	uniform	0.0208
+bsratesc_BdlDDrTr	0.0104	0.0312	uniform	0.0208
+bsratesc_GrassC3	0.00625	0.01875	uniform	0.0125
+bsratesc_GrassC4	0.00625	0.01875	uniform	0.0125
+humicfac_NdlEvgTr	0.21	0.63	uniform	0.42
+humicfac_NdlDcdTr	0.21	0.63	uniform	0.42
+humicfac_BdlEvgTr	0.265	0.795	uniform	0.53
+humicfac_BdlDCoTr	0.240	0.720	uniform	0.48
+humicfac_BdlDDrTr	0.240	0.720	uniform	0.48
+humicfac_GrassC3	0.21	0.63	uniform	0.42
+humicfac_GrassC4	0.21	0.63	uniform	0.42
+biodiffus	1.36986e-07	4.10958e-07	uniform	2.73972e-7
+cryodiffus	0.68493e-06	2.05479e-06	uniform	1.36986e-6
+tanha	0.72	2.16	uniform	1.44
+tanhb	0.28	0.84	uniform	0.56
+tanhc	0.0375	0.1125	uniform	0.075
+tanhd	23.0	69.0	uniform	46.0
+t_crit	-1.5	-0.5	uniform	-1.0
+moisc	2.0	6.0	uniform	4.0
+r_depthredu	5.0	15.0	uniform	10.0
+
+
+

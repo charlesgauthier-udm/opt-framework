@@ -1,0 +1,9 @@
+# Parameter prior file
+# File contains prior knowledge of parameters that are to be optimized
+parameter_name	lower_bound	higher_bound	distribution_type	initial_value
+bsratelt	0.5	1.5	uniform	1
+bsratesc	0.5	1.5	uniform	1
+humicfac	0.5	1.5	uniform	1
+tanha	0.72	2.16	uniform	1.44
+
+
