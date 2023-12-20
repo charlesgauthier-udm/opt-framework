@@ -8,19 +8,18 @@ import pickle
 import matplotlib.pyplot as plt
 
 # Importing CLASSIC outputs for gridcell dimensions and properties
-CLASSIC = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/rsFile_modified.nc')  # Loading netcdf file
-actlyr = xr.open_dataset('/media/charlesgauthier/Seagate Backup Plus Drive/global_opt_files_latest/actlyrmax_annually.nc')
+CLASSIC = xr.open_dataset('rsFile_modified.nc') # Loading netcdf restart file to get grid info
 classic_lon = np.array(CLASSIC['lon'].data)     # Assigning longitudes [0, 360 degrees]
 classic_lat = np.array(CLASSIC['lat'].data)     # Assigning latitudes [-90, 90 degrees]
 classic_ipeat = CLASSIC['ipeatland'].data[0,:,:]
 
 # Importing wosis observation data
-woSIS = xr.open_dataset('/media/charlesgauthier/Seagate Backup Plus Drive/datasets/WoSIS/woSIS_soilc_sgbd_5p.nc') # Loading netcdf
+woSIS = xr.open_dataset('woSIS_soilc_sgbd_5p.nc') # Loading netcdf
 woSIS_lon = woSIS['longitude'].data                 # Assigning longitude
 woSIS_lat = woSIS['latitude'].data                  # Assigning latitude
 
 # Importing srdb observation data
-srdb = xr.open_dataset('/media/charlesgauthier/Seagate Backup Plus Drive/datasets/SRDB_V5/srdb_formatted.nc')
+srdb = xr.open_dataset('srdb_formatted.nc')
 srdb_lon = srdb['longitude'].data       # Assigning longitude
 srdb_lat = srdb['latitude'].data        # Assigning latitude
 srdb_resp = srdb['rs_annual'].data      # Annual soil C resp. [kg C m^-2]
@@ -37,7 +36,8 @@ classic_lonw[:-1] = classic_lon
 Building nested list in this fashion: Every element of the list corresponds to a CLASSIC gridcell. Instead of keeping 
 gridcells in a 2D array format, they are flatten and only gridcells that have woSIS/srdb data within them are kept for 
 optimization. Corresponding flatten lons & lats arrays are saved in .npy files to be read-in alongside the nested list
-when optimizing. In the nested list, every element (or gridcell) is formatted like so:
+when optimizing. The dataset_flag numpy array is also saved even if contained in the nested list for easier access by 
+the optimization framework. In the nested list, every element (or gridcell) is formatted like so:
 0- woSIS organic carbon content [kg C m^-2]
 1- woSIS lower depth of measurment [m]
 2- srbd annual soil C respiration [kg C m^-2 yr^-1]
@@ -103,15 +103,14 @@ for f in range(0,len(grid)):
     dataset_flag[f] = flag
 
 # Saving dataset_flag array
-np.save('/home/charlesgauthier/project/global_opt_files/dataset_flag_5p', dataset_flag)
+np.save('dataset_flag_5p', dataset_flag)          # saving to current directory
 # Saving nested list
 with open('wosis_srdb_grid_5p.txt','wb') as fp:
-    pickle.dump(grid, fp)
-#with open('dataset_spatial_grid.txt','wb') as fp:
-#    pickle.dump(grid2, fp)
+    pickle.dump(grid, fp)                         # saving to current directory
+
 # Saving lons & lats associated with nested list
-np.save('/home/charlesgauthier/project/global_opt_files/grid_opt_lats_5p', grid_lats)
-np.save('/home/charlesgauthier/project/global_opt_files/grid_opt_lons_5p', grid_lons)
+np.save('grid_opt_lats_5p', grid_lats)            # saving to current directory
+np.save('grid_opt_lons_5p', grid_lons)            # saving to current directory
 
 
 
