@@ -3,12 +3,12 @@ import xarray as xr
 import time
 import frmatctem
 
-# Loading lats & lons of gridcell that contain data
-lats = np.load('/home/charlesgauthier/project/global_opt_files/grid_opt_lats_5p.npy')
-lons = np.load('/home/charlesgauthier/project/global_opt_files/grid_opt_lons_5p.npy')
+# Loading lats & lons of gridcell that contain WoSIS/SRDB data
+lats = np.load('grid_opt_lats_5p.npy')
+lons = np.load('grid_opt_lons_5p.npy')
 
-# START OF BLOCK OF CODE TO COMPUTE FILTRD INDEX
-# We then use actlyr because it is a small file and it allows us to see which gridcells containing observations are not simulated by the model
+# Computing the indices of CLASSIC gridcells containing WoSIS/SRDB data using the variable filtrd_index
+# We use actlyr because it is a small file and it allows us to see which gridcells containing observations are not simulated by the model
 actlyr = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/actlyrmax_annually.nc')
 init = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/rsFile_modified.nc')
 ncell = len(lats)
@@ -24,42 +24,37 @@ for i in range(0,ncell):
         actlyr_tab[:, i] = actlyr['actlyrmax'].sel(latitude=lats[i], longitude=lons[i])
 
 
-# When then identify index of gridcells that contain model values and we save those indices
-np.save('/home/charlesgauthier/project/global_opt_files/filtrd_index_5p',np.where(~np.isnan(actlyr_tab[0])))
-# END OF BLOCK OF CODE TO FORMAT FILTRDINDEX
+# When then identify index of gridcells that contain WoSIS/SRDB values and we save those indices
+np.save('filtrd_index_5p',np.where(~np.isnan(actlyr_tab[0])))
 
-
-# BLOCK OF CODE TO REMOVE CLASSIC GRIDCELL WITH OBS. IN THEM THAT ARE NOT SIMULATED BY THE MODEL
-#Removing gridcells where the model doesn't simulate anything
-ind = np.load('/home/charlesgauthier/project/global_opt_files/filtrd_index_5p.npy')
+#Removing gridcells where there is WoSIS/SRDB data but where the model doesn't simulate anything
+ind = np.load('filtrd_index_5p.npy')
 lats = lats[ind[0]]
 lons = lons[ind[0]]
-np.save('/home/charlesgauthier/project/global_opt_files/opt_lats.npy',lats)
-np.save('/home/charlesgauthier/project/global_opt_files/opt_lons.npy',lons)
-# END OF BLOCK OF CODE TO REMOVE GRIDCELLS WITH OBS NOT SIMULATED BY THE MODEL
+np.save('opt_lats.npy',lats)
+np.save('opt_lons.npy',lons)
 
 # Formating starts here. Here is some precisions on the few lat/lons files
 # grid_lats_5p = lats/lon of all gridcells containing observations regardless of if the cell is simulated by the model
 # opt_lats = lat/lon of gridcells containing observations and that are simulated by the model <- this one is used to format files
 
 # Loading optimization lats and lons
-
-lats = np.load('/home/charlesgauthier/project/global_opt_files/opt_lats.npy')
-lons = np.load('/home/charlesgauthier/project/global_opt_files/opt_lons.npy')
+lats = np.load('opt_lats.npy')
+lons = np.load('opt_lons.npy')
 
 # Loading input files to be formatted
-init = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/rsFile_modified.nc')
-rmrveg = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/rmrveg_annually.nc')
-sftlf = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/sftlf.nc')
-actlyrmax = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/actlyrmax_annually.nc')
-npp = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/npp_daily_perpft.nc')
-fRootLitter = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/fRootLitter_daily_perpft.nc')
-fStemLitter = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/fStemLitter_daily_perpft.nc')
-fLeafLitter = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/fLeafLitter_daily_perpft.nc')
-cRoot = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/cRoot_daily_perpft.nc')
-mrsfl = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/mrsfl_daily.nc')
-mrsll = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/mrsll_daily.nc')
-tsl = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/tsl_daily.nc')
+init = xr.open_dataset('rsFile_modified.nc')
+rmrveg = xr.open_dataset('rmrveg_annually.nc')
+sftlf = xr.open_dataset('sftlf.nc')
+actlyrmax = xr.open_dataset('actlyrmax_annually.nc')
+npp = xr.open_dataset('npp_daily_perpft.nc')
+fRootLitter = xr.open_dataset('fRootLitter_daily_perpft.nc')
+fStemLitter = xr.open_dataset('fStemLitter_daily_perpft.nc')
+fLeafLitter = xr.open_dataset('fLeafLitter_daily_perpft.nc')
+cRoot = xr.open_dataset('cRoot_daily_perpft.nc')
+mrsfl = xr.open_dataset('mrsfl_daily.nc')
+mrsll = xr.open_dataset('mrsll_daily.nc')
+tsl = xr.open_dataset('tsl_daily.nc')
 
 # Global variable
 ncell = len(lats)
@@ -205,7 +200,7 @@ for i in range(0,split):
     rmatctem = frmatctem.rmatctemf2(zbotw_split[i],alpha,cRoot_split[i],avertmas,abar,sdepth_split[i],maxannualactlyr,mxrtdpth)
     rmatctem.astype('float32')
 
-    np.save('/home/charlesgauthier/project/global_opt_files/opt_files/rmatctem_complete'+str(i)+'.npy',rmatctem)
+    np.save('rmatctem_complete'+str(i)+'.npy',rmatctem)
     tf = time.time() - t1
     print('Time spent on current iteration: ', int(tf//60), 'minute ',round(tf%60,0), 'secondes')
     print(i,' / ',split)
