@@ -27,7 +27,6 @@ cp -v /home/chargaut/scratch/MPI_Run/MPI_array_allocation.py ./
 cp -v /home/chargaut/scratch/formating_global_files/pre_split_narval/* ./
 cp -v /home/chargaut/scratch/MPI_Run/outputs/article_results/s1_eo_opt_out_2900.pkl ./
 
-#mpiexec -n 48 python3 pre_spliting_files.py
 mpiexec -n 32 python3 main_s1_eo.py --prior=/home/chargaut/scratch/MPI_Run/prior_classic_scenario1w.txt --loss=/home/chargaut/scratch/MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py --algo=tpe
 
 
