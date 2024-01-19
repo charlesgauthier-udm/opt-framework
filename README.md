@@ -7,7 +7,7 @@ Optimisation framework to optimize the soil carbon parameters of CLASSIC.
 
 `format_files` folder contains the script needed to format the typicall netcdf files produced by CLASSIC to the numpy arrays needed by the framework.
 
-`input_files' is an empty folder that has to be filled with the `.npy` files
+`input_files` is an empty folder that has to be filled with the `.npy` files
 
 `lib_fixed_turbation` folder contains the python wrapping of the modified fortrant turbation routine used by the model.
 
