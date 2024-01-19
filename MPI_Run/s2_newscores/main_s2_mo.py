@@ -5,13 +5,13 @@ import numpy as np
 import pandas as pd
 import pickle
 
-def main(prior, loss, algorithm):
+def main(prior, loss, algorithm,outfile,iter):
     # loading prior distribution of parameters
     prior = pd.read_csv(prior, sep='\t', header=2)
 
     # Launching optimiaztion
     if algorithm == 'tpe':
-        opt_out = algo_s2_mo.a_tpe(prior, loss, 3000)  # Optimisation with tpe algorithm
+        opt_out = algo_s2_mo.a_tpe(prior, loss, iter, outfile)  # Optimisation with tpe algorithm
         #best = opt_out.best_trial               # List of best parameters
         #stats = opt_out.trials                  # Info on each step in optimisation
         #loss = opt_out.losses()                 # List of loss score at each step in optimization
@@ -51,7 +51,14 @@ if __name__ == '__main__':
                         type=str,
                         help='python file to desired algorithm',
                         required=True)
+    parser.add_argument('--outfile',
+                        type=str,
+                        help='name of the framework output file to start from',)
+    parser.add_argument('--iter',
+                        type=int,
+                        help='number of optimization iteration',
+                        required=True)
     args = parser.parse_args()
-    main(prior=args.prior, loss=args.loss, algorithm=args.algo)
+    main(prior=args.prior, loss=args.loss, algorithm=args.algo,outfile=args.outfile,iter=args.iter)
 
 

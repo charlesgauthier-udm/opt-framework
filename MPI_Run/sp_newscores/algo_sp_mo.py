@@ -7,7 +7,7 @@ import os
 import loss_model_global_mpi_sp_mo
 import pickle
 
-def a_tpe(prior, f, args):
+def a_tpe(prior, f, args, outfile):
     """
     Performs the optimisation of the search space using the TPE algorithm
     :param prior: dictionary of prior distribution of the parameters
@@ -29,8 +29,10 @@ def a_tpe(prior, f, args):
     it = args           # number of search iterations
     if it <= 0 or type(it) != int:
         raise Exception('Invalid iteration value, must be positive integer')
-    #trials = Trials()
-    trials = pickle.load(open("sp_mo_opt_out_2900.pkl", "rb"))
+    if outfile is None:
+        trials = Trials()
+    else:
+        trials = pickle.load(open(outfile, "rb"))
     best = fmin(
         fn=loss_model_global_mpi_sp_mo.loss,           # Objective Function to optimize
         space=space,    # hyperparameter's Search space

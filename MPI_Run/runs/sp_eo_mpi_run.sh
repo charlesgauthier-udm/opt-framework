@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=20:00:00
+#SBATCH --time=23:59:00
 #SBATCH --account=def-sonol
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
@@ -8,28 +8,38 @@
 #SBATCH --mail-type=ALL
 
 
+# Get parent directories name
+runs=$(pwd)
+
+# Get the parent directory path
+MPI_Run=$(dirname "$runs")
+optfdir=$(dirname "$MPI_Run")
+
+
 module load python/3.8
 module load scipy-stack
 module load mpi4py
 
 cd $SLURM_TMPDIR/
 
-source ~/ENV_2/bin/activate
+source ~/ENV_2/bin/activate # activate environment
 
-cp -v /home/chargaut/scratch/MPI_Run/sp_newscores/main_sp_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fenv.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fscore.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fturbation.py ./
-cp -v /home/chargaut/scratch/MPI_Run/sp_newscores/algo_sp_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/sp_newscores/loss_model_global_mpi_sp_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/sp_newscores/func_model_sp.py ./
-cp -v /home/chargaut/scratch/MPI_Run/MPI_array_allocation.py ./
-cp -v /home/chargaut/scratch/formating_global_files/pre_split_narval/* ./
-cp -v /home/chargaut/scratch/MPI_Run/outputs/article_results/sp_eo_opt_out_2900.pkl ./
+# copy files to tmpdir
+cp -v $MPI_Run/sp_newscores/main_sp_eo.py ./
+cp -v $MPI_Run/fenv.py ./
+cp -v $MPI_Run/fscore.py ./
+cp -v $MPI_Run/fturbation.py ./
+cp -v $MPI_Run/sp_newscores/algo_sp_eo.py ./
+cp -v $MPI_Run/sp_newscores/loss_model_global_mpi_sp_eo.py ./
+cp -v $MPI_Run/sp_newscores/func_model_sp.py ./
+cp -v $MPI_Run/MPI_array_allocation.py ./
+cp -v $optfdir/input_files/* ./
 
-#mpiexec -n 48 python3 pre_spliting_files.py
-mpiexec -n 32 python3 main_sp_eo.py --prior=/home/chargaut/scratch/MPI_Run/prior_classic_scenariopw.txt --loss=/home/chargaut/scratch/MPI_Run/sp_newscores/loss_model_global_mpi_sp_eo.py --algo=tpe
+# If we start from a checkpoint we uncomment the cp command below and change the directory accordingly and we
+# add --outfile [name_of_the_file.py] to the mpiexec call to the main script, e.g. --outfile=sp_eo_opt_out_2900.pkl
+# cp -v $MPI_Run/outputs/sp_eo_opt_out_2900.pkl ./
+
+mpiexec -n 32 python3 main_sp_eo.py --prior=$MPI_Run/prior_classic_scenario1w.txt --loss=$MPI_Run/sp_newscores/loss_model_global_mpi_sp_eo.py --algo=tpe --iter=100
 
 
-cp -v ./sp_eo_opt_out_* /home/chargaut/scratch/MPI_Run/outputs/article_results
-
+cp -v ./sp_eo_opt_out_* $MPI_Run/outputs

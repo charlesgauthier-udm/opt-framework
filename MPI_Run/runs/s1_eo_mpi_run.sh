@@ -8,26 +8,38 @@
 #SBATCH --mail-type=ALL
 
 
+# Get parent directories name
+runs=$(pwd)
+
+# Get the parent directory path
+MPI_Run=$(dirname "$runs")
+optfdir=$(dirname "$MPI_Run")
+
+
 module load python/3.8
 module load scipy-stack
 module load mpi4py
 
 cd $SLURM_TMPDIR/
 
-source ~/ENV_2/bin/activate
+source ~/ENV_2/bin/activate # activate environment
 
-cp -v /home/chargaut/scratch/MPI_Run/s1_newscores/main_s1_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fenv.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fscore.py ./
-cp -v /home/chargaut/scratch/MPI_Run/fturbation.py ./
-cp -v /home/chargaut/scratch/MPI_Run/s1_newscores/algo_s1_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py ./
-cp -v /home/chargaut/scratch/MPI_Run/s1_newscores/func_model_s1.py ./
-cp -v /home/chargaut/scratch/MPI_Run/MPI_array_allocation.py ./
-cp -v /home/chargaut/scratch/formating_global_files/pre_split_narval/* ./
-cp -v /home/chargaut/scratch/MPI_Run/outputs/article_results/s1_eo_opt_out_2900.pkl ./
+# copy files to tmpdir
+cp -v $MPI_Run/s1_newscores/main_s1_eo.py ./
+cp -v $MPI_Run/fenv.py ./
+cp -v $MPI_Run/fscore.py ./
+cp -v $MPI_Run/fturbation.py ./
+cp -v $MPI_Run/s1_newscores/algo_s1_eo.py ./
+cp -v $MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py ./
+cp -v $MPI_Run/s1_newscores/func_model_s1.py ./
+cp -v $MPI_Run/MPI_array_allocation.py ./
+cp -v $optfdir/input_files/* ./
 
-mpiexec -n 32 python3 main_s1_eo.py --prior=/home/chargaut/scratch/MPI_Run/prior_classic_scenario1w.txt --loss=/home/chargaut/scratch/MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py --algo=tpe
+# If we start from a checkpoint we uncomment the cp command below and change the directory accordingly and we
+# add --outfile [name_of_the_file.py] to the mpiexec call to the main script, e.g. --outfile=s1_eo_opt_out_2900.pkl
+# cp -v $MPI_Run/outputs/s1_eo_opt_out_2900.pkl ./
+
+mpiexec -n 32 python3 main_s1_eo.py --prior=$MPI_Run/prior_classic_scenario1w.txt --loss=$MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py --algo=tpe --iter=100
 
 
-cp -v ./s1_eo_opt_out_* /home/chargaut/scratch/MPI_Run/outputs/article_results
+cp -v ./s1_eo_opt_out_* $MPI_Run/outputs/article_results
