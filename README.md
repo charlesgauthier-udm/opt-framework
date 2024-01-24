@@ -9,7 +9,7 @@ Optimisation framework to optimize the soil carbon parameters of CLASSIC.
 
 `input_files` is an empty folder that has to be filled with the `.npy` files
 
-`lib_fixed_turbation` folder contains the python wrapping of the modified fortrant turbation routine used by the model.
+`lib_fixed_turbation` folder contains the python wrapping of the modified fortran turbation routine used by the model.
 
 ## Getting started
 
