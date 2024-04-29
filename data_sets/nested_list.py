@@ -2,10 +2,7 @@
 # Importing modules
 import numpy as np
 import xarray as xr
-import time
-from scipy.interpolate import interp1d
 import pickle
-import matplotlib.pyplot as plt
 
 # Importing CLASSIC outputs for gridcell dimensions and properties
 CLASSIC = xr.open_dataset('rsFile_modified.nc') # Loading netcdf restart file to get grid info

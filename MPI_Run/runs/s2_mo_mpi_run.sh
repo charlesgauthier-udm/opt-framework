@@ -28,7 +28,6 @@ source ~/ENV_2/bin/activate # activate environment
 cp -v $MPI_Run/s2_newscores/main_s2_mo.py ./
 cp -v $MPI_Run/fenv.py ./
 cp -v $MPI_Run/fscore.py ./
-cp -v $MPI_Run/fturbation.py ./
 cp -v $MPI_Run/s2_newscores/algo_s2_mo.py ./
 cp -v $MPI_Run/s2_newscores/loss_model_global_mpi_s2_mo.py ./
 cp -v $MPI_Run/s2_newscores/func_model_s2.py ./

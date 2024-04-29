@@ -1,5 +1,4 @@
 import numpy as np
-import fturbation
 import fenv
 import time
 from numba import njit

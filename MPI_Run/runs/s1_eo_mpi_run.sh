@@ -28,7 +28,6 @@ source ~/ENV_2/bin/activate # activate environment
 cp -v $MPI_Run/s1_newscores/main_s1_eo.py ./
 cp -v $MPI_Run/fenv.py ./
 cp -v $MPI_Run/fscore.py ./
-cp -v $MPI_Run/fturbation.py ./
 cp -v $MPI_Run/s1_newscores/algo_s1_eo.py ./
 cp -v $MPI_Run/s1_newscores/loss_model_global_mpi_s1_eo.py ./
 cp -v $MPI_Run/s1_newscores/func_model_s1.py ./
