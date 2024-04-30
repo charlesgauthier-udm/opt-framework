@@ -9,8 +9,8 @@ lons = np.load('grid_opt_lons_5p.npy')
 
 # Computing the indices of CLASSIC gridcells containing WoSIS/SRDB data using the variable filtrd_index
 # We use actlyr because it is a small file and it allows us to see which gridcells containing observations are not simulated by the model
-actlyr = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/actlyrmax_annually.nc')
-init = xr.open_dataset('/home/charlesgauthier/project/global_opt_files/rsFile_modified.nc')
+actlyr = xr.open_dataset('actlyrmax_annually.nc')
+init = xr.open_dataset('rsFile_modified.nc')
 ncell = len(lats)
 nyears = len(actlyr.time.data)
 
@@ -90,7 +90,7 @@ for i in range(0,ncell):
     grclarea[i] = init['grclarea'].sel(lat=lats[i],lon=lons[i])
     fcancmx[:9,i] = init['fcancmx'].sel(lat=lats[i], lon=lons[i])
     litrmass[:,:,i] = init['litrmass'].sel(lat=lats[i],lon=lons[i])[0]
-    soilcmass[:,:,i] - init['soilcmas'].sel(lat=lats[i],lon=lons[i])[0]
+    soilcmass[:,:,i] = init['soilcmas'].sel(lat=lats[i],lon=lons[i])[0]
     CLAY[:,i] = init['CLAY'].sel(lat=lats[i], lon=lons[i])[0]
     SAND[:,i] = init['SAND'].sel(lat=lats[i], lon=lons[i])[0]
     sdepth[i] = init['SDEP'].sel(lat=lats[i], lon=lons[i])[0]
@@ -114,7 +114,7 @@ np.save('grclarea_complete',grclarea)
 np.save('fcancmx_complete',fcancmx)
 np.save('litrmass_complete',litrmass)
 np.save('CLAY_complete',CLAY)
-np.save('/SAND_complete',SAND)
+np.save('SAND_complete',SAND)
 np.save('sdepth_complete',sdepth)
 np.save('sftlf_complete',sftlf_a)
 np.save('actlyrmax_monthly_complete',actlyrmax_a)
@@ -184,23 +184,33 @@ avertmas = np.array([1.85, 1.45, 2.45, 2.10, 2.10,0.1, 0.1, 0.7,0.7,0,0])
 abar = np.array([4.70,5.86,3.87,3.46,3.97,3.97,3.97,5.86,4.92,4,4])
 mxrtdpth = np.array([3,3,5,5,3,2,2,1,1,0,0])
 
-# Here we split the arrays to compute subset of rmatctem because it is a too large array to handle at once
-ncell = 10
-tot_ncell = 1507
-split = tot_ncell // ncell +1
+# We now compute rmatctem
+rmatctem = frmatctem.rmatctemf2(zbotw,alpha,cRoot,avertmas,abar,sdepth,maxannualactlyr,mxrtdpth)
+rmatctem.astype('float32')
+np.save('rmatctem_complete', rmatctem)
 
-cRoot_split = np.array_split(cRoot, split, axis=2)
-maxannualactlyr_split = np.array_split(maxannualactlyr, split, axis=1)
-zbotw_split = np.array_split(zbotw,split, axis=1)
-sdepth_split = np.array_split(sdepth, split)
-
-final = np.empty([44165,11,20,0],dtype='float32')
-for i in range(0,split):
-    t1 = time.time()
-    rmatctem = frmatctem.rmatctemf2(zbotw_split[i],alpha,cRoot_split[i],avertmas,abar,sdepth_split[i],maxannualactlyr,mxrtdpth)
-    rmatctem.astype('float32')
-
-    np.save('rmatctem_complete'+str(i)+'.npy',rmatctem)
-    tf = time.time() - t1
-    print('Time spent on current iteration: ', int(tf//60), 'minute ',round(tf%60,0), 'secondes')
-    print(i,' / ',split)
+########################################################################################################################
+# SECTION BELOW FORMATS RMATCTEM IN SUBSETS TO BE LESS COMPUTATIONALLY EXPENSIVE, UNCOMMENT IF NECESSARY ###############
+########################################################################################################################
+# # Here we split the arrays to compute subset of rmatctem because it is a too large array to handle at once
+# ncell = 10 # Number of gridcells per split
+# tot_ncell = 1507
+# split = tot_ncell // ncell +1
+#
+# # We split input arrays to rmatctem
+# cRoot_split = np.array_split(cRoot, split, axis=2)
+# maxannualactlyr_split = np.array_split(maxannualactlyr, split, axis=1)
+# zbotw_split = np.array_split(zbotw,split, axis=1)
+# sdepth_split = np.array_split(sdepth, split)
+#
+# # We loop on the subsets and compute and save the rmatctem subsets
+# for i in range(0,split):
+#     t1 = time.time()
+#     rmatctem = frmatctem.rmatctemf2(zbotw_split[i],alpha,cRoot_split[i],avertmas,abar,sdepth_split[i],maxannualactlyr,mxrtdpth)
+#     rmatctem.astype('float32')
+#
+#     np.save('rmatctem_complete'+str(i)+'.npy',rmatctem)
+#     tf = time.time() - t1
+#     print('Time spent on current iteration: ', int(tf//60), 'minute ',round(tf%60,0), 'secondes')
+#     print(i,' / ',split)
+########################################################################################################################

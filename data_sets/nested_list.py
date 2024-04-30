@@ -32,9 +32,9 @@ classic_lonw[:-1] = classic_lon
 '''
 Building nested list in this fashion: Every element of the list corresponds to a CLASSIC gridcell. Instead of keeping 
 gridcells in a 2D array format, they are flatten and only gridcells that have woSIS/srdb data within them are kept for 
-optimization. Corresponding flatten lons & lats arrays are saved in .npy files to be read-in alongside the nested list
+optimization, forming a vector. Corresponding flatten lons & lats arrays are saved in .npy files to be read-in alongside the nested list
 when optimizing. The dataset_flag numpy array is also saved even if contained in the nested list for easier access by 
-the optimization framework. In the nested list, every element (or gridcell) is formatted like so:
+the optimization framework. In the nested list, every element (or gridcell)of the vector is formatted like so:
 0- woSIS organic carbon content [kg C m^-2]
 1- woSIS lower depth of measurment [m]
 2- srbd annual soil C respiration [kg C m^-2 yr^-1]
