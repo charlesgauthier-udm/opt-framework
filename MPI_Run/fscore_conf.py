@@ -2,6 +2,8 @@ import numpy as np
 import pickle
 import xarray as xr
 from scipy.interpolate import interp1d
+import numpy as np
+
 
 def custom_score_conf(true_csoil, true_resp, sim_csoil, sim_resp, typicall_std):
     # Average csoil pool to get mean state
@@ -42,6 +44,7 @@ def custom_score_conf(true_csoil, true_resp, sim_csoil, sim_resp, typicall_std):
     mo_resp = 1 - np.exp(-np.abs(norm_sim_resp - norm_true_resp))
     mo_resp = np.nanmean(mo_resp)
     return eo_csoil, mo_csoil, eo_resp, mo_resp
+
 
 def custom_score_wosis(wosis, classic, classic_zbot, typicall_std):
     """
