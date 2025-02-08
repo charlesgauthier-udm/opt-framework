@@ -33,6 +33,10 @@ cp -v $MPI_Run/sc_newscores/loss_model_global_mpi_sc_mo.py ./
 cp -v $MPI_Run/sc_newscores/func_model_sc.py ./
 cp -v $MPI_Run/MPI_array_allocation.py ./
 cp -v $optfdir/input_files/* ./
+cp -v $optfdir/format_files/rsFile_modified.nc ./
+cp -v $optfdir/data_sets/filtrd_index_5p.npy ./
+cp -v $optfdir/data_sets/dataset_flag_5p.npy ./
+cp -v $optfdir/data_sets/wosis_srdb_grid_5p.txt ./
 
 # If we start from a checkpoint we uncomment the cp command below and change the directory accordingly and we
 # add --outfile [name_of_the_file.py] to the mpiexec call to the main script, e.g. --outfile=s3_mo_opt_out_2900.pkl

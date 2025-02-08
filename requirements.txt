@@ -1,25 +1,23 @@
-cftime==1.5.0+computecanada
-cloudpickle==2.0.0+computecanada
-Cython==0.29.28+computecanada
-emcee==3.0.2+computecanada
-future==0.18.2+computecanada
-h5netcdf==0.7.4+computecanada
-h5py==3.6.0+computecanada
-hyperopt==0.2.5+computecanada
-lib-fixed-turbation @ file:///home/chargaut/project/lib_fixed_turbation
-lib-turbation @ file:///home/chargaut/project/lib_turbation
-llvmlite==0.36.0+computecanada
-netCDF4==1.5.8+computecanada
-networkx==2.8+computecanada
-numba==0.53.1+computecanada
-numpy==1.22.2+computecanada
-packaging==21.3+computecanada
-pandas==1.4.1+computecanada
-pyparsing==3.0.8+computecanada
-python-dateutil==2.8.2+computecanada
-pytz==2022.1+computecanada
-scipy==1.8.0+computecanada
-six==1.16.0+computecanada
-tqdm==4.64.0+computecanada
-xarray==2022.3.0+computecanada
+cftime==1.5.0
+cloudpickle==2.0.0
+Cython==0.29.28
+emcee==3.0.2
+future==0.18.2
+h5netcdf==0.7.4
+h5py==3.6.0
+hyperopt==0.2.5
+llvmlite==0.36.0
+netCDF4==1.5.8
+networkx==2.8
+numba==0.53.1
+numpy==1.22.2
+packaging==21.3
+pandas==1.4.1
+pyparsing==3.0.8
+python-dateutil==2.8.2
+pytz==2022.1
+scipy==1.8.0
+six==1.16.0
+tqdm==4.64.0
+xarray==2022.3.0
 

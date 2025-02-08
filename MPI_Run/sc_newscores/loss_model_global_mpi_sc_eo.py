@@ -122,8 +122,32 @@ def loss(params):
         true_csoil = np.load('cSoilperlay_complete.npy')
         true_resp = np.load('rSoil_monthly_complete.npy')
 
+        # Import necessary files for score computing
+        init = xr.open_dataset('rsFile_modified.nc')
+        # Depth of soil layers
+        delz = init['DELZ'].data[:]  # Ground layer thickness [m]
+        zbot = np.zeros_like(delz)  # Dept of the bottom of each soil layer [m]
+        for i in range(0, len(delz)):
+            zbot[i] = np.sum(delz[:i + 1])
+        classic_zbot = np.zeros(len(zbot) + 1)
+        classic_zbot[1:] = zbot
+
+        filtrd = np.load('filtrd_index_5p.npy')
+        dataset_flag = np.load('dataset_flag_5p.npy')
+        dataset_flag = dataset_flag[filtrd]
+        with open('wosis_srdb_grid_5p.txt', 'rb') as fp:
+            grid = pickle.load(fp)
+        grid = np.array(grid, dtype=object)
+        grid = grid[filtrd]
+        iwosis = np.where((dataset_flag == 1) | (dataset_flag == 2))
+        isrdb = np.where((dataset_flag == 2) | (dataset_flag == 3))
+        wosis = grid[iwosis]
+        srdb = grid[isrdb]
+
         # Scores
-        eo_csoil, mo_csoil, eo_resp, mo_resp = fscore.custom_score_conf(true_csoil, true_resp, arg_output, arg3_output, 0.7995)
+        eo_csoil, mo_csoil = fscore.custom_score_conf_csoil(true_csoil[:, :, iwosis[0]], arg_output[:, iwosis[0], :], 0.7995,
+                                                       wosis, classic_zbot)
+        eo_resp, mo_resp = fscore.custom_score_conf_resp(true_resp[:, isrdb[0]], arg3_output[isrdb[0]], srdb)
 
         # Computing score
         alpha = 0.5

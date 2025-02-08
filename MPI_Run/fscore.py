@@ -3,32 +3,107 @@ import pickle
 import xarray as xr
 from scipy.interpolate import interp1d
 
-def custom_score_conf(true_csoil, true_resp, sim_csoil, sim_resp, typicall_std):
+
+def custom_score_conf_csoil(true_csoil, sim_csoil, typicall_std, wosis, classic_zbot):
+    # Empty arrays to store formatted data
+    true_tab = []  # Array of average value for pseudo obs. at WoSIS depths
+    sim_tab = []  # Array of averege values for simulated csoil at wosis depths
+
     # Average csoil pool to get mean state
-    av_sim_csoil = np.nanmean(sim_csoil,axis=2) # Time average
-    av_sim_resp = np.nanmean(sim_resp,axis=1)
+    av_sim_csoil = np.nanmean(sim_csoil, axis=2)  # Time average
 
-    av_true_csoil = np.nanmean(true_csoil,axis=0) # Time average
-    av_true_resp = np.nanmean(true_resp,axis=0)
+    av_true_csoil = np.nanmean(true_csoil, axis=0)  # Time average
 
+    for h in range(0, len(wosis)):  # Looping on gridcell containing Wosis data
+        # Observation data
+        depth = np.array(wosis[h][1][0])  # List of all layer depths in the gridcell
+        orgc = np.array(wosis[h][0][0])  # Array of wosis soil C value for all layers in the gridcell
+
+        # Model output
+        classic_orgc = av_sim_csoil[:, h]  # Model simulated soil C
+        temp = np.zeros(21)  # Formatting to add layer at surface with 0 soil C
+        temp[1:] = classic_orgc
+        classic_orgc = temp
+
+        # Pseudo-obs
+        true_orgc = av_true_csoil[:, h]
+        temp = np.zeros(21)  # Formatting to add layer at surface with 0 soil C
+        temp[1:] = true_orgc
+        true_orgc = temp
+
+        values = np.unique(depth)  # All possible values of depth in the gridcell
+
+        for k in range(0, len(values)):  # Looping on all possible depth value in the grid cell
+            current_depth = values[k]  # Current depth that is being used
+            ind = np.where(depth == values[k])  # Index of all layers that are at the current depth
+
+            f_sim = interp1d(classic_zbot,
+                             classic_orgc)  # Interpolation function from model's layer depth and soil C values
+            classic_inter_orgc = f_sim(current_depth)  # Interpolating CLASSIC soil C at current depth
+
+            f_true = interp1d(classic_zbot, true_orgc)
+            true_inter_orgc = f_true(current_depth)
+            # classic_inter_orgc = interpolate(classic_zbot,classic_orgc,current_depth)
+
+            # Adding to empty arrays
+            true_tab.append(true_inter_orgc)
+            sim_tab.append(classic_inter_orgc)
+
+    true_tab = np.array(true_tab)
+    sim_tab = np.array(sim_tab)
     # Normalized arrays
-    norm_true_csoil = av_true_csoil / av_true_csoil
-    norm_sim_csoil = av_sim_csoil / av_true_csoil
+    norm_true = true_tab / true_tab
+    norm_sim = sim_tab / true_tab
 
-    norm_true_resp = av_true_resp / av_true_resp
-    norm_sim_resp = av_sim_resp / av_true_resp
 
-    #======================================================
+    # ======================================================
     # SOIL C SCORES
-    #======================================================
+    # ======================================================
     # Error oriented score for soil C
-    eo_csoil = typicall_std * (norm_sim_csoil - norm_true_csoil) ** 4
-    eo_csoil = np.clip(eo_csoil, 0, 100) # Limit upper bound to 100
-    eo_csoil = np.nanmean(eo_csoil) # Average over gridcells and soil layers
+    eo_csoil = typicall_std * (norm_sim - norm_true) ** 4
+    eo_csoil = np.clip(eo_csoil, 0, 100)  # Limit upper bound to 100
+    eo_csoil = np.nanmean(eo_csoil)  # Average over gridcells and soil layers
 
     # Mean oriented score for soil C
-    mo_csoil = 1 - np.exp(-np.abs(norm_sim_csoil - norm_true_csoil))
-    mo_csoil = np.nanmean(mo_csoil) # Average over gridcells and soil layers
+    mo_csoil = 1 - np.exp(-np.abs(norm_sim - norm_true))
+    mo_csoil = np.nanmean(mo_csoil)  # Average over gridcells and soil layers
+
+    return eo_csoil, mo_csoil
+
+
+def custom_score_conf_resp(true_resp, sim_resp, srdb):
+    srdb_resp = srdb[:, 2]  # Soil respiration data from SRDB
+    srdb_begin_yr = srdb[:, 4]  # Start year of observation data
+    srdb_stop_yr = srdb[:, 5]  # Stop year
+
+    # Creating empty arrays to store data for comparison
+    sim_resp_tab = np.array([])  # Simulated soil respiration
+    true_resp_tab = np.array([])  # Observational soil respiration data
+
+    # Getting every datapoint for comparison
+    for i in range(0, len(srdb)):  # Looping on each gridcell containing SRDB data
+        # Converting start/stop year to index of the model output
+        ibegin_sim = (
+            np.floor((365 * srdb_begin_yr[i][0][:, 0] - 1900 * 365 - 22265 + 1)).astype(int))  # array idex for begin yr
+
+        istop_sim = (np.floor(365 * srdb_stop_yr[i][0][:, 0] - 1900 * 365 - 22265 + 1)).astype(
+            int)  # array index for stop yr
+        ibegin_true = (srdb_begin_yr[i][0][:,0] * 12 - 1961*12).astype(int)
+        istop_true = (srdb_stop_yr[i][0][:,0] * 12 - 1961*12).astype(int)
+        for j in range(0, len(ibegin_sim)):  # Looping on all data in a single gridcell
+            # Adding datapoints to empty arrays
+            current_resp = np.mean(sim_resp[i, ibegin_sim[j]:istop_sim[j]])  # CLASSIC's simulated heterotrophic resp
+            sim_resp_tab = np.append(sim_resp_tab, current_resp)
+
+        for k in range(0, len(ibegin_true)):
+            # Adding datapoints to empty arrays
+            current_resp = np.mean(true_resp[ibegin_true[k]:istop_true[k], i])  # CLASSIC's simulated heterotrophic resp
+            true_resp_tab = np.append(true_resp_tab, current_resp)
+
+
+    # Normalized arrays
+    norm_true_resp = true_resp_tab / true_resp_tab
+    norm_sim_resp = sim_resp_tab / true_resp_tab
 
     #======================================================
     # RESP SCORES
@@ -41,7 +116,7 @@ def custom_score_conf(true_csoil, true_resp, sim_csoil, sim_resp, typicall_std):
     # Mean oriented score for resp
     mo_resp = 1 - np.exp(-np.abs(norm_sim_resp - norm_true_resp))
     mo_resp = np.nanmean(mo_resp)
-    return eo_csoil, mo_csoil, eo_resp, mo_resp
+    return eo_resp, mo_resp
 
 def custom_score_wosis(wosis, classic, classic_zbot, typicall_std):
     """
